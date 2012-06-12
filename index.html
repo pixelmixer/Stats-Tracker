@@ -7,16 +7,28 @@
 
 		socket.on('connect', function ()
 		{
-			socket.emit('set nickname', prompt('What is your nickname?'));
+			var username = prompt('What is your nickname?');
+
+			socket.emit('set nickname', username);
 			socket.on('ready', function ()
 			{
 				console.log('Connected !');
-				socket.emit('msg', prompt('What is your message?'));
+				var message = prompt('What is your message?');
+				socket.emit('msg', message);
+
+				document.getElementById('feed').innerHTML += '<br/>' + username + ': ' + message;
+			});
+
+			socket.on('msg', function (msg)
+			{
+				document.getElementById('feed').innerHTML += '<br/>' + msg.name + ': ' + msg.message;
 			});
 		});
 	</script>
 </head>
 <body>
+	<div id="feed">
+	</div>
 	Hello World...
 </body>
 </html>
