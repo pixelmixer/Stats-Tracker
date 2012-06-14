@@ -9,7 +9,7 @@ app.configure( function() {
 
 app.listen(3000);
 
-var databaseUrl = "mydb"; // "username:password@example.com/mydb"
+var databaseUrl = "mydb2"; // "username:password@example.com/mydb"
 var collections = ["users", "reports", "servers"]
 var db = require("mongojs").connect(databaseUrl, collections);
 
@@ -18,19 +18,19 @@ db.users.save({email: "srirangan@gmail.com", password: "iLoveMongo", sex: "male"
   if( err || !saved ) console.log("User not saved");
   else console.log("User saved");
 });
-
+/*
 // app.js
-db.users.update({email: "srirangan@gmail.com"}, {$set: {password: "iReallyLoveMongo"}}, function(err, updated) {
+db.users.update({email: "srirangan@gmail.com"}, { set: {password: "iReallyLoveMongo"}}, function(err, updated) {
   if( err || !updated ) console.log("User not updated");
   else console.log("User updated");
 });
 
 // app.js
-db.users.update({email: "srirangan@gmail.com"}, {$set: {sex: "female"}}, function(err, updated) {
+db.users.update({email: "srirangan@gmail.com"}, { set: {sex: "female"}}, function(err, updated) {
   if( err || !updated ) console.log("User not updated");
   else console.log("User updated");
 });
-
+*/
 app.get('/', function(req, res) {
 	//console.log( req );
 	// app.js
@@ -77,6 +77,32 @@ app.get('/registerserver/:userid/:serverip', function(req, res)
 });
 
 
+app.get('/openservers', function(req, res)
+{
+	res.contentType('application/xml');
+	
+	var html = '<servers>';
+	db.servers.find({}, function(err, servers) {
+		if( err || !servers)
+		{
+			console.log("No servers found");
+			res.send( 'No servers found.' );
+		}
+		else servers.forEach( function( openserver )
+		{
+			html += '<server';
+			html += ' ip="' + openserver.serverip + '"';
+			html += ' userid="' + openserver.userid + '"';
+			html += ' id="' + openserver._id + '"';
+			html += ' online="' + openserver.online + '"';
+			html += '></server>';
+			console.log( html );
+			
+		});
+		html += '</servers>';
+		res.send( html );
+	});
+});
 
 
 /*
