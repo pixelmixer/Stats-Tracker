@@ -5,6 +5,7 @@ var app = express.createServer();
 
 // Configuration
 app.configure( function() {
+	app.use(express.bodyParser());
 });
 
 app.listen(3000);
@@ -14,11 +15,12 @@ var collections = ["users", "reports", "servers"]
 var db = require("mongojs").connect(databaseUrl, collections);
 
 // app.js
+/*
 db.users.save({email: "srirangan@gmail.com", password: "iLoveMongo", sex: "male"}, function(err, saved) {
   if( err || !saved ) console.log("User not saved");
   else console.log("User saved");
 });
-/*
+/*d
 // app.js
 db.users.update({email: "srirangan@gmail.com"}, { set: {password: "iReallyLoveMongo"}}, function(err, updated) {
   if( err || !updated ) console.log("User not updated");
@@ -31,6 +33,7 @@ db.users.update({email: "srirangan@gmail.com"}, { set: {sex: "female"}}, functio
   else console.log("User updated");
 });
 */
+/*
 app.get('/', function(req, res) {
 	//console.log( req );
 	// app.js
@@ -53,11 +56,18 @@ app.get('/', function(req, res) {
 
 	
 });
+*/
 
-app.get('/registerserver/:userid/:serverip', function(req, res)
+app.post('/', function(req, res) {
+	console.log( req.body );
+});
+
+
+app.post('/registerserver', function(req, res)
 {
-	var userid = req.params.userid;
-	var serverip = req.params.serverip;
+	var userid = req.body.userid;
+	var serverip = req.body.serverip;
+	
 	db.servers.save
 	({
 		userid: userid, 
@@ -80,8 +90,8 @@ app.get('/registerserver/:userid/:serverip', function(req, res)
 app.get('/openservers', function(req, res)
 {
 	res.contentType('application/xml');
-	
-	var html = '<servers>';
+
+	var xml = '<servers>';
 	db.servers.find({}, function(err, servers) {
 		if( err || !servers)
 		{
@@ -90,17 +100,16 @@ app.get('/openservers', function(req, res)
 		}
 		else servers.forEach( function( openserver )
 		{
-			html += '<server';
-			html += ' ip="' + openserver.serverip + '"';
-			html += ' userid="' + openserver.userid + '"';
-			html += ' id="' + openserver._id + '"';
-			html += ' online="' + openserver.online + '"';
-			html += '></server>';
-			console.log( html );
+			xml += '<server';
+			xml += ' ip="' + openserver.serverip + '"';
+			xml += ' userid="' + openserver.userid + '"';
+			xml += ' id="' + openserver._id + '"';
+			xml += ' online="' + openserver.online + '"';
+			xml += '></server>';
 			
 		});
-		html += '</servers>';
-		res.send( html );
+		xml += '</servers>';
+		res.send( xml );
 	});
 });
 
